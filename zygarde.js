@@ -223,6 +223,21 @@ client.on("ready", () => {
       // [tag OR -c class] [-i instance] message
       const message = relatedClassPrefix + instancePrefix + msg.message;
 
+      // attempt to find the avatar of the sender, if they're on the
+      // Discord side
+      let avatar = undefined;
+      for (const guild of client.guilds.values()) {
+        if (discordServer !== guild.name) {
+          continue;
+        }
+        let member = Array(guild.members.values()).find(
+          member => member.displayName === sender
+        );
+        if (member) {
+          avatar = member.user.displayAvatarURL;
+        }
+      }
+
       // Send the message!
       const webhook = await channel
         .fetchWebhooks()
@@ -230,7 +245,11 @@ client.on("ready", () => {
         .catch(err => console.error(err));
 
       if (webhook) {
-        webhook.send(message, { username: sender, split: true });
+        webhook.send(message, { 
+          username: sender, 
+          avatarURL: ???,
+          split: true
+        });
       } else {
         channel.send(message, { split: true });
       }
